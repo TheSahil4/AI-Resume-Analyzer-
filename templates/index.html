@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ResumeIQ — Resume Analyzer</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <div class="shell">
+    <nav class="nav">
+      <a class="brand" href="/"><span class="brand-icon">R</span> Resume<span class="accent">IQ</span></a>
+      <span class="nav-label">CAREER TOOLKIT</span>
+    </nav>
+
+    <header class="hero">
+      <div class="eyebrow"><span class="pulse"></span> SMART RESUME REVIEW</div>
+      <h1>Make your resume<br><span>work smarter.</span></h1>
+      <p>Compare your resume with a job description, discover matching skills, and find practical ways to improve.</p>
+    </header>
+
+    <main class="grid">
+      <section class="panel form-panel">
+        <div class="panel-heading">
+          <div><span class="step">01</span><h2>Your documents</h2></div>
+          <span class="tiny-tag">INPUT</span>
+        </div>
+        {% if error %}<div class="error">{{ error }}</div>{% endif %}
+        <form method="post" enctype="multipart/form-data">
+          <label for="resume_text">Resume text</label>
+          <textarea id="resume_text" name="resume_text" placeholder="Paste the text from your resume here...">{{ resume_text }}</textarea>
+          <div class="or-line"><span>OR UPLOAD A FILE</span></div>
+          <label class="upload-box" for="resume_file">
+            <span class="upload-icon">↑</span>
+            <span><strong>Choose a .txt resume</strong><small>Maximum file size: 5 MB</small></span>
+            <input id="resume_file" name="resume_file" type="file" accept=".txt">
+          </label>
+          <label for="job_description" class="job-label">Job description</label>
+          <textarea id="job_description" name="job_description" class="job-text" placeholder="Paste the role requirements here...">{{ job_description }}</textarea>
+          <button class="analyze-btn" type="submit">Analyze resume <span>↗</span></button>
+          <p class="privacy-note">Your resume is analyzed locally by this app. This basic version uses keyword matching, not a hosted AI model.</p>
+        </form>
+      </section>
+
+      <section class="panel results-panel">
+        <div class="panel-heading">
+          <div><span class="step">02</span><h2>Analysis report</h2></div>
+          <span class="tiny-tag">RESULTS</span>
+        </div>
+        {% if result %}
+          <div class="score-card">
+            <div><span class="muted">JOB SKILL MATCH</span><div class="score">{{ result.score }}<small>/100</small></div></div>
+            <div class="score-ring" style="--score: {{ result.score }}%"><span>{{ result.score }}%</span></div>
+          </div>
+          <p class="score-explain">Keyword overlap between skills mentioned in your resume and the job description. This is not an employment decision.</p>
+
+          <div class="result-block">
+            <h3><span class="dot green"></span> Matching skills <span class="count">{{ result.matched|length }}</span></h3>
+            {% if result.matched %}<div class="chips">{% for skill in result.matched %}<span class="chip good">{{ skill }}</span>{% endfor %}</div>{% else %}<p class="empty">No tracked skill keywords matched. Try adding relevant skills if you have them.</p>{% endif %}
+          </div>
+
+          <div class="result-block">
+            <h3><span class="dot amber"></span> Skills to address <span class="count">{{ result.missing|length }}</span></h3>
+            {% if result.missing %}<div class="chips">{% for skill in result.missing %}<span class="chip missing">{{ skill }}</span>{% endfor %}</div>{% else %}<p class="empty">No tracked skill gaps found.</p>{% endif %}
+          </div>
+
+          <div class="result-block">
+            <h3><span class="dot blue"></span> Strengths</h3>
+            <ul>{% for item in result.strengths %}<li>{{ item }}</li>{% endfor %}</ul>
+          </div>
+          <div class="result-block">
+            <h3><span class="dot purple"></span> Improvement suggestions</h3>
+            <ul>{% for item in result.improvements %}<li>{{ item }}</li>{% endfor %}</ul>
+          </div>
+          <div class="report-footer">Analyzed {{ result.word_count }} words · Basic keyword-based report</div>
+        {% else %}
+          <div class="empty-state">
+            <div class="doc-illustration"><div class="doc-top"></div><i></i><i></i><i></i><b>✓</b></div>
+            <h3>Your insights will appear here</h3>
+            <p>Paste your resume and a job description, then click Analyze resume to generate your report.</p>
+            <div class="mini-features"><span>↗ Skill matching</span><span>◎ Gap detection</span><span>✦ Suggestions</span></div>
+          </div>
+        {% endif %}
+      </section>
+    </main>
+    <footer>RESUMEIQ <span>·</span> BUILT WITH PYTHON & FLASK <span>·</span> FOR CAREER GROWTH</footer>
+  </div>
+</body>
+</html>
